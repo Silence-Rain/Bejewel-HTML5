@@ -33,12 +33,14 @@ export default {
 }
 
 .left {
-  width: 30%;
+  width: 300px;
+  margin: 0 20px;
   display: flex;
   flex-direction: column;
 }
 
 .right {
-  width: 70%;
+  width: 700px;
+  margin: 0 20px;
 }
 </style>

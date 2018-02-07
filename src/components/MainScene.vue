@@ -1,8 +1,10 @@
 <template>
 	<div id="scene">
-		<div class="row" v-for="row in matrix">
-			<div class="gem" :x="item.x" :y="item.y" :style="{backgroundColor: item.color}" :class="{selected: item.isSelected}" @click="selectGem" v-for="item in row"></div>
+		<!-- <transition-group name="slide-fade"> -->
+		<div class="row" v-for="(row,index) in matrix" :key="index">
+			<div class="gem" :x="item.x" :y="item.y" :style="{backgroundColor: item.color}" :class="{selected: item.isSelected}" @click="selectGem" v-for="item in row">{{item.val}}</div>
 		</div>
+		<!-- </transition-group> -->
 	</div>
 </template>
 
@@ -11,11 +13,11 @@
 		name: "MainScene",
 		data () {
 			return {
-				matrix: [],																																//宝石矩阵
-				colors: ["#f00", "#0f0", "#00f", "#ff8c00", "#ffd700", "#800080", "#fff"],//宝石颜色枚举
-				selected: false,																													//当前是否有宝石被选中
-				first: {},																																//第一次选中的宝石坐标
-				second: {}																																//第二次选中的宝石坐标
+				matrix: [],																																					//宝石矩阵
+				colors: ["#FE5C5C", "#52FD52", "#136BDE", "#D0D029", "#FEA33F", "#D41DD4", "#FFF"],	//宝石颜色枚举
+				selected: false,																																		//当前是否有宝石被选中
+				first: {},																																					//第一次选中的宝石坐标
+				second: {}																																					//第二次选中的宝石坐标
 			}
 		},
 
@@ -49,21 +51,32 @@
 			selectGem (event) {
 				if (!this.selected) {
 					this.selected = true
-					this.first.x = event.target.attributes.x.value
-					this.first.y = event.target.attributes.y.value
+					this.first.x = Number(event.target.attributes.x.value)
+					this.first.y = Number(event.target.attributes.y.value)
 					this.matrix[this.first.x][this.first.y].isSelected = true
 				}
 				else {
-					this.second.x = event.target.attributes.x.value
-					this.second.y = event.target.attributes.y.value
+					this.second.x = Number(event.target.attributes.x.value)
+					this.second.y = Number(event.target.attributes.y.value)
+
+					if (this.first.x == this.second.x && this.first.y == this.second.y) {
+						this.matrix[this.second.x][this.second.y].isSelected = false
+						return
+					}
+
 					this.matrix[this.second.x][this.second.y].isSelected = true
 
 					if (this.checkGemConnection(this.first, this.second)) {
 						this.swap(this.first, this.second)
-						console.log(this.first, this.second)
 
-						if (this.checkGemElimination()) {
-							this.eliminate()
+						let res1 = this.checkGemElimination(this.first)
+						let res2 = this.checkGemElimination(this.second)
+
+						if (res1.flag) {
+							this.eliminate(res1.start, res1.end)
+						}
+						else if (res2.flag) {
+							this.eliminate(res2.start, res2.end)
 						}
 						else {
 							this.swap(this.first, this.second)
@@ -75,8 +88,8 @@
 					}
 					else {
 						this.matrix[this.first.x][this.first.y].isSelected = false
-						this.first.x = event.target.attributes.x.value
-						this.first.y = event.target.attributes.y.value
+						this.first.x = Number(event.target.attributes.x.value)
+						this.first.y = Number(event.target.attributes.y.value)
 					}
 				}
 			},
@@ -111,13 +124,195 @@
 
 			//检查交换后状态是否可以消除（5*5邻域内判断）
 			//先判断是否存在3个相连，若存在，沿该方向继续寻找更多的相连匹配
-			checkGemElimination () {
-				return true
+			//三个相连的6种情况：
+			//*****			*****			**o**			*****			*****			*****
+			//*****			*****			**o**			*****			*****			**o**
+			//ooo**			**ooo			**o**			**o**			*ooo*			**o**
+			//*****			*****			*****			**o**			*****			**o**
+			//*****			*****			*****			**o**			*****			*****
+			checkGemElimination (pos) {
+				var ret = {flag: false, start: {}, end: {}}
+				var curType = this.matrix[pos.x][pos.y].val
+				var neighbor = this.getNeighbor(pos)
+
+				//case 1
+				if (curType == neighbor[0] && curType == neighbor[1]) {
+					ret.flag = true
+					ret.start.x = pos.x
+					ret.start.y = pos.y - 2
+					ret.end.x = pos.x
+					ret.end.y = pos.y
+				}
+
+				//case 2
+				if (curType == neighbor[2] && curType == neighbor[3]) {
+					ret.flag = true
+					ret.start.x = pos.x
+					ret.start.y = pos.y
+					ret.end.x = pos.x
+					ret.end.y = pos.y + 2
+				}
+
+				//case 3
+				if (curType == neighbor[4] && curType == neighbor[5]) {
+					ret.flag = true
+					ret.start.x = pos.x - 2
+					ret.start.y = pos.y
+					ret.end.x = pos.x
+					ret.end.y = pos.y
+				}
+
+				//case 4
+				if (curType == neighbor[6] && curType == neighbor[7]) {
+					ret.flag = true
+					ret.start.x = pos.x
+					ret.start.y = pos.y
+					ret.end.x = pos.x + 2
+					ret.end.y = pos.y
+				}
+
+				//case 5
+				if (curType == neighbor[1] && curType == neighbor[2]) {
+					ret.flag = true
+					ret.start.x = pos.x
+					ret.start.y = pos.y - 1
+					ret.end.x = pos.x
+					ret.end.y = pos.y + 1
+				}
+
+				//case 6
+				if (curType == neighbor[5] && curType == neighbor[6]) {
+					ret.flag = true
+					ret.start.x = pos.x - 1 
+					ret.start.y = pos.y
+					ret.end.x = pos.x + 1
+					ret.end.y = pos.y
+				}
+
+				//TODO：在相连的方向上延伸查找
+				console.log(ret)
+				return ret
 			},
 
 			//消除3个以上连着的宝石，并补充矩阵
-			eliminate () {
+			//分行消除，列消除两种情况
+			eliminate (start, end) {
+				//行消除
+				if (start.x == end.x) {
+					let len = end.y - start.y + 1
 
+					// //消除
+					// for (var i = start.y; i <= end.y; i++) {
+					// 	this.matrix[start.x].splice(i, 1)
+					// }
+
+					//上方原有的宝石下降
+					for (var i = start.x - 1; i >= 0; i--) {
+						for (var j = start.y; j <= end.y; j++) {
+							this.matrix[i + 1][j] = this.matrix[i][j]
+							this.matrix[i + 1][j].x += 1
+						}
+					}
+
+					//从顶部补充新宝石
+					for (var i = start.y; i <= end.y; i++) {
+						var temp = {}
+						temp.val = Math.ceil(Math.random() * 7)			//宝石的值（即颜色）
+						temp.color = this.colors[temp.val - 1]			//宝石颜色
+						temp.isSelected = false											//宝石被选中的状态
+						temp.x = start.x 														//当前宝石横坐标
+						temp.y = i																	//当前宝石纵坐标
+
+						this.matrix[0][i] = temp
+					}
+
+					//TODO: checkGemElimination
+				}
+				//列消除
+				else {
+					let len = end.x - start.x + 1
+
+					// //消除
+					// for (var i = start.x; i <= end.x; i++) {
+					// 	this.matrix[i].splice(start.y, 1)
+					// }
+
+					//上方原有的宝石下落
+					for (var i = start.x - 1; i >= 0; i--) {
+						this.matrix[i + len][start.y] = this.matrix[i][start.y]
+						this.matrix[i + len][start.y].x += len
+					}
+
+					//从顶部补充新宝石
+					for (var i = 0; i < len; i++) {
+						var temp = {}
+						temp.val = Math.ceil(Math.random() * 7)			//宝石的值（即颜色）
+						temp.color = this.colors[temp.val - 1]			//宝石颜色
+						temp.isSelected = false											//宝石被选中的状态
+						temp.x = i 																	//当前宝石横坐标
+						temp.y = start.y														//当前宝石纵坐标
+
+						this.matrix[i][start.y] = temp
+					}
+
+					//TODO: checkGemElimination
+				}
+			},
+
+			//求出当前位置宝石的邻域
+			//返回的结果为[左2左1，右1右2，上2上1，下1下2]
+			//对边角情况特殊处理，不可达位置记为0
+			//邻域为：
+			//**o**
+			//**o**
+			//oo*oo
+			//**o**
+			//**o**
+			getNeighbor (pos) {
+				var ret = []
+
+				if (pos.x - 2 >= 0)
+					ret[4] = this.matrix[pos.x - 2][pos.y].val
+				else
+					ret[4] = 0
+
+				if (pos.x - 1 >= 0)
+					ret[5] = this.matrix[pos.x - 1][pos.y].val
+				else
+					ret[5] = 0
+
+				if (pos.x + 1 <= 7)
+					ret[6] = this.matrix[pos.x + 1][pos.y].val
+				else
+					ret[6] = 0
+
+				if (pos.x + 2 <= 7)
+					ret[7] = this.matrix[pos.x + 2][pos.y].val
+				else
+					ret[7] = 0
+
+				if (pos.y - 2 >= 0)
+					ret[0] = this.matrix[pos.x][pos.y - 2].val
+				else
+					ret[0] = 0
+
+				if (pos.y - 1 >= 0)
+					ret[1] = this.matrix[pos.x][pos.y - 1].val
+				else
+					ret[1] = 0
+
+				if (pos.y + 1 <= 7)
+					ret[2] = this.matrix[pos.x][pos.y + 1].val
+				else
+					ret[2] = 0
+
+				if (pos.y + 2 <= 7)
+					ret[3] = this.matrix[pos.x][pos.y + 2].val
+				else
+					ret[3] = 0
+
+				console.log(ret)
+				return ret
 			}
 		}
 	}
@@ -130,14 +325,28 @@
 }
 
 .gem {
-	width: 80px;
-	height: 80px;
+	width: 60px;
+	height: 60px;
 	line-height: 80px;
 	text-align: center;
 	border: 1px solid #aaa;
+	border-radius: 10px;
+	margin: 10px;
 }
 
 .selected {
-	border: 2px solid #000;
+	opacity: 0.6;
+}
+
+.slide-fade-enter-active {
+  transition: all .3s ease;
+}
+.slide-fade-leave-active {
+  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateY(240px);
+  opacity: 0;
 }
 </style>
