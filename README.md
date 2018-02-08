@@ -1,21 +1,19 @@
 # bejewel-html5
 
-> A Vue.js project
+用Vue.js写的一个自娱自乐的破产版宝石迷阵，还亟需优化……
 
-## Build Setup
+---
 
-``` bash
-# install dependencies
-npm install
+## 功能
 
-# serve with hot reload at localhost:8080
-npm run dev
+- 消除连续3个宝石，记30分（4个及以上的消除还没实现）
 
-# build for production with minification
-npm run build
+- 对分数的存档
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+## 已知bug
 
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+- setting和hint还没有写……
+
+- 有时会出现莫名其妙的消除（正在寻找原因……）
+
+- report bug由于还没有后端，所以暂未实现
