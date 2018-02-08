@@ -2,7 +2,7 @@
 	<div id="scene">
 		<!-- <transition-group name="slide-fade"> -->
 		<div class="row" v-for="(row,index) in matrix" :key="index">
-			<div class="gem" :x="item.x" :y="item.y" :style="{backgroundColor: item.color}" :class="{selected: item.isSelected}" @click="selectGem" v-for="item in row">{{item.val}}</div>
+			<div class="gem" :x="item.x" :y="item.y" :style="{backgroundColor: item.color}" :class="{selected: item.isSelected}" @click="selectGem" v-for="item in row"></div>
 		</div>
 		<!-- </transition-group> -->
 	</div>
@@ -21,7 +21,7 @@
 			}
 		},
 
-		//初始化，随机填充宝石矩阵（不能出现可消除的情况）
+		//初始化，随机填充宝石矩阵
 		created () {
 			for (var i = 0; i < 8; i++) {
 				var temp = []
@@ -37,8 +37,19 @@
 				}
 				this.matrix.push(temp)
 			}
+		},
 
-			//TODO：排除可消除的情况
+		//排除可消除的情况
+		mounted () {
+			for (var row of this.matrix) {
+				for (var item of row) {
+					let res = this.checkGemElimination(item)
+
+					if (res.flag) {
+						this.eliminate(res.start, res.end)
+					}
+				}
+			}
 		},
 
 		methods: {
@@ -73,10 +84,12 @@
 						let res2 = this.checkGemElimination(this.second)
 
 						if (res1.flag) {
-							this.eliminate(res1.start, res1.end)
+							let len = this.eliminate(res1.start, res1.end)
+							this.$emit("inc", len)
 						}
 						else if (res2.flag) {
-							this.eliminate(res2.start, res2.end)
+							let len = this.eliminate(res2.start, res2.end)
+							this.$emit("inc", len)
 						}
 						else {
 							this.swap(this.first, this.second)
@@ -190,7 +203,6 @@
 				}
 
 				//TODO：在相连的方向上延伸查找
-				console.log(ret)
 				return ret
 			},
 
@@ -226,7 +238,18 @@
 						this.matrix[0][i] = temp
 					}
 
-					//TODO: checkGemElimination
+					for (var row of this.matrix) {
+						for (var item of row) {
+							let res = this.checkGemElimination(item)
+
+							if (res.flag) {
+								let len = this.eliminate(res.start, res.end)
+								this.$emit("inc", len)
+							}
+						}
+					}
+
+					return len
 				}
 				//列消除
 				else {
@@ -255,7 +278,18 @@
 						this.matrix[i][start.y] = temp
 					}
 
-					//TODO: checkGemElimination
+					for (var row of this.matrix) {
+						for (var item of row) {
+							let res = this.checkGemElimination(item)
+
+							if (res.flag) {
+								let len = this.eliminate(res.start, res.end)
+								this.$emit("inc", len)
+							}
+						}
+					}
+
+					return len
 				}
 			},
 
@@ -311,7 +345,6 @@
 				else
 					ret[3] = 0
 
-				console.log(ret)
 				return ret
 			}
 		}

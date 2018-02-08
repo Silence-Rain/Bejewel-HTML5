@@ -1,11 +1,11 @@
 <template>
   <div id="app">
     <div class="left">
-      <Scoreboard/>
-      <CtrlPanel/>
+      <Scoreboard :score="score"/>
+      <CtrlPanel :score="score"/>
     </div>
     <div class="right">
-      <MainScene/>
+      <MainScene @inc="inc"/>
     </div>
   </div>
 </template>
@@ -21,6 +21,27 @@ export default {
     MainScene,
     Scoreboard,
     CtrlPanel
+  },
+
+  data () {
+    return {
+      score: 0
+    }
+  }, 
+
+  created () {
+    if (localStorage.score) {
+      this.score = Number(localStorage.score)
+    }
+    else {
+      this.score = 0
+    }
+  },
+
+  methods: {
+    inc (msg) {
+      this.score += msg * 10
+    }
   }
 }
 </script>
