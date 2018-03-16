@@ -1,6 +1,7 @@
 # bejewel-html5
 
 用Vue.js写的一个自娱自乐的破产版宝石迷阵，还亟需优化……
+现已上线测试，地址: silence-rain.cn/bejeweled
 
 ---
 
