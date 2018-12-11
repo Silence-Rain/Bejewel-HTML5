@@ -10,6 +10,9 @@
 </template>
 
 <script>
+	import axios from 'axios'
+	axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded'
+
 	export default {
 		name: "Scoreboard",
 
@@ -32,6 +35,17 @@
 
 				return ret
 			}
+		}, 
+
+		mounted () {
+			axios.get("http://silence-rain.cn:9991/save")
+				.then((response) => {
+					this.score = response.data.result.res
+				})
+				.catch((response) => {
+					console.log(response)
+					alert("网络错误，请稍后再试")
+				})
 		}
 	}
 </script>

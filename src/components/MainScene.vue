@@ -369,17 +369,9 @@
 
 .selected {
 	opacity: 0.6;
+	border: 2px solid #000;
+	width: 58px;
+	height: 58px;
 }
 
-.slide-fade-enter-active {
-  transition: all .3s ease;
-}
-.slide-fade-leave-active {
-  transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
-}
-.slide-fade-enter, .slide-fade-leave-to
-/* .slide-fade-leave-active for below version 2.1.8 */ {
-  transform: translateY(240px);
-  opacity: 0;
-}
 </style>

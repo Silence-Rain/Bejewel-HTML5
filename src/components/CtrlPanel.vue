@@ -1,22 +1,20 @@
 <template>
 	<div id="panel">
-		<div class="hint" @click="hint">Hint</div>
+		<!-- <div class="hint" @click="hint">Hint</div> -->
 		<div class="btn" @click="save">Save</div>
-		<div class="btn" @click="setting">Settings</div>
+		<!-- <div class="btn" @click="setting">Settings</div> -->
 		<div class="btn" @click="report" style="font-size:25px;">Report Bugs</div>
 	</div>
 </template>
 
 <script>
+	import axios from 'axios'
+
 	export default {
 		name: "CtrlPanel",
 
 		props: {
 			score: Number
-		},
-
-		created () {
-
 		},
 
 		methods: {
@@ -27,8 +25,11 @@
 
 			//保存用户数据至localStorage
 			save () {
-				localStorage.setItem("score", this.score)
-				//localStorage.setItem("matrix", JSON.stringify(this.matrix))
+				axios.post("http://silence-rain.cn:9991/save", {score: this.score})
+					.then(response => alert("保存成功"))
+					.catch(response => alert("保存失败，请稍后再试"))
+				// localStorage.setItem("score", this.score)
+				// localStorage.setItem("matrix", JSON.stringify(this.matrix))
 			},
 
 			setting () {
