@@ -57,15 +57,13 @@ class HintHandler(BaseHandler):
 		matrix = self.get_argument("matrix")
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 		s.connect(("localhost", 9992))
-		s.send(b"hell")
 
-		msg = s.recv(1024)
-		print(msg.decode("utf8"))
+		s.send(b"%s\n" % matrix)
 
+		res = s.recv(1024).decode("utf8")
 		s.close()
-		print(matrix)
 
-		self.finish_success(result={"res": [1,1]})
+		self.finish_success(result={"res": res.split(" ")})
 
 
 class SaveHandler(BaseHandler):
