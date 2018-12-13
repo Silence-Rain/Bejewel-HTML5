@@ -11,7 +11,6 @@
 
 <script>
 	import axios from 'axios'
-	axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded'
 
 	export default {
 		name: "Scoreboard",
@@ -38,7 +37,7 @@
 		}, 
 
 		mounted () {
-			axios.get("http://silence-rain.cn:9991/save")
+			axios.get(this.baseUrl+"/save")
 				.then((response) => {
 					this.score = response.data.result.res
 				})

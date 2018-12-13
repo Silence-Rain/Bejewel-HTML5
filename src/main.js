@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 
 Vue.config.productionTip = false
+Vue.prototype.baseUrl = "http://localhost:9991"
 
 /* eslint-disable no-new */
 new Vue({

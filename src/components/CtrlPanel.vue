@@ -1,6 +1,6 @@
 <template>
 	<div id="panel">
-		<!-- <div class="hint" @click="hint">Hint</div> -->
+		<div class="hint" @click="hint">Hint</div>
 		<div class="btn" @click="save">Save</div>
 		<!-- <div class="btn" @click="setting">Settings</div> -->
 		<div class="btn" @click="report" style="font-size:25px;">Report Bugs</div>
@@ -14,22 +14,25 @@
 		name: "CtrlPanel",
 
 		props: {
-			score: Number
+			score: Number,
+			mat: String
 		},
 
 		methods: {
 			//给用户下一步的提示
 			hint () {
-
+				axios.post(this.baseUrl+"/hint", JSON.stringify({matrix: this.mat}))
+					.then(response => {
+						let position = response.data.result.res
+						this.$parent.$emit("hint", JSON.stringify(position))
+					})
+					.catch(response => alert("保存失败，请稍后再试"))
 			},
 
-			//保存用户数据至localStorage
 			save () {
-				axios.post("http://silence-rain.cn:9991/save", {score: this.score})
+				axios.post(this.baseUrl+"/save", {score: this.score})
 					.then(response => alert("保存成功"))
 					.catch(response => alert("保存失败，请稍后再试"))
-				// localStorage.setItem("score", this.score)
-				// localStorage.setItem("matrix", JSON.stringify(this.matrix))
 			},
 
 			setting () {

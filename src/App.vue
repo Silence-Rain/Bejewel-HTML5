@@ -2,10 +2,10 @@
   <div id="app">
     <div class="left">
       <Scoreboard :score="score"/>
-      <CtrlPanel :score="score"/>
+      <CtrlPanel :score="score" :mat="mat"/>
     </div>
     <div class="right">
-      <MainScene @inc="inc"/>
+      <MainScene @inc="inc" ref="main"/>
     </div>
   </div>
 </template>
@@ -25,7 +25,9 @@ export default {
 
   data () {
     return {
-      score: 0
+      score: 0,
+      mat: "",
+      position: []
     }
   }, 
 
@@ -36,6 +38,32 @@ export default {
     else {
       this.score = 0
     }
+  },
+
+  mounted () {
+    let matInit = this.$refs.main.getMatrix()
+    let res = []
+    for (let line of matInit) {
+      for (let item of line) {
+        res.push(item.val)
+      }
+    }
+    this.mat = res.join(" ")
+
+    this.$on("mat", matrix => {
+      let temp = JSON.parse(matrix)
+      let res = []
+      for (let line of temp) {
+        for (let item of line) {
+          res.push(item.val)
+        }
+      }
+      this.mat = res.join(" ")
+    })
+
+    this.$on("hint", pos => {
+      this.$refs.main.changeSelect(pos)
+    })
   },
 
   methods: {

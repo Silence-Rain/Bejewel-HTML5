@@ -2,7 +2,7 @@
 	<div id="scene">
 		<!-- <transition-group name="slide-fade"> -->
 		<div class="row" v-for="(row,index) in matrix" :key="index">
-			<div class="gem" :x="item.x" :y="item.y" :style="{backgroundColor: item.color}" :class="{selected: item.isSelected}" @click="selectGem" v-for="item in row"></div>
+			<div class="gem" :x="item.x" :y="item.y" :style="{backgroundColor: item.color}" :class="{selected: item.isSelected, hinted: item.isHint}" @click="selectGem" v-for="item in row"></div>
 		</div>
 		<!-- </transition-group> -->
 	</div>
@@ -13,12 +13,16 @@
 		name: "MainScene",
 		data () {
 			return {
-				matrix: [],																																					//宝石矩阵
+				matrix: [],//宝石矩阵
 				colors: ["#FE5C5C", "#52FD52", "#136BDE", "#D0D029", "#FEA33F", "#D41DD4", "#FFF"],	//宝石颜色枚举
-				selected: false,																																		//当前是否有宝石被选中
-				first: {},																																					//第一次选中的宝石坐标
-				second: {}																																					//第二次选中的宝石坐标
+				selected: false,//当前是否有宝石被选中
+				first: {},//第一次选中的宝石坐标
+				second: {}//第二次选中的宝石坐标
 			}
+		},
+
+		props: {
+			position: Array
 		},
 
 		//初始化，随机填充宝石矩阵
@@ -27,11 +31,12 @@
 				var temp = []
 				for (var j = 0; j < 8; j++) {
 					var obj = {}
-					obj.val = Math.ceil(Math.random() * 7)		//宝石的值（即颜色）
-					obj.color = this.colors[obj.val - 1]			//宝石颜色
-					obj.isSelected = false										//宝石被选中的状态
-					obj.x = i 																//当前宝石横坐标
-					obj.y = j																	//当前宝石纵坐标
+					obj.val = Math.ceil(Math.random() * 7)	//宝石的值（即颜色）
+					obj.color = this.colors[obj.val - 1]	//宝石颜色
+					obj.isSelected = false					//宝石被选中的状态
+					obj.isHint = false						//宝石被提示的状态
+					obj.x = i 								//当前宝石横坐标
+					obj.y = j								//当前宝石纵坐标
 
 					temp.push(obj)
 				}
@@ -53,6 +58,13 @@
 		},
 
 		methods: {
+			changeSelect (pos) {
+				pos = JSON.parse(pos)
+				this.matrix[pos[1]][pos[0]].isHint = true
+			},
+			getMatrix () {
+				return this.matrix
+			},
 			//选中宝石
 			//若是第一次选中，记录选中坐标并改变其选中状态
 			//若是第二次选中，先检查能否交换
@@ -76,6 +88,7 @@
 					}
 
 					this.matrix[this.second.x][this.second.y].isSelected = true
+					this.$parent.$emit("mat", JSON.stringify(this.matrix))
 
 					if (this.checkGemConnection(this.first, this.second)) {
 						this.swap(this.first, this.second)
@@ -231,9 +244,10 @@
 						var temp = {}
 						temp.val = Math.ceil(Math.random() * 7)			//宝石的值（即颜色）
 						temp.color = this.colors[temp.val - 1]			//宝石颜色
-						temp.isSelected = false											//宝石被选中的状态
-						temp.x = start.x 														//当前宝石横坐标
-						temp.y = i																	//当前宝石纵坐标
+						temp.isSelected = false							//宝石被选中的状态
+						temp.isHint = false								//宝石被提示的状态
+						temp.x = start.x 								//当前宝石横坐标
+						temp.y = i										//当前宝石纵坐标
 
 						this.matrix[0][i] = temp
 					}
@@ -271,9 +285,10 @@
 						var temp = {}
 						temp.val = Math.ceil(Math.random() * 7)			//宝石的值（即颜色）
 						temp.color = this.colors[temp.val - 1]			//宝石颜色
-						temp.isSelected = false											//宝石被选中的状态
-						temp.x = i 																	//当前宝石横坐标
-						temp.y = start.y														//当前宝石纵坐标
+						temp.isSelected = false							//宝石被选中的状态
+						temp.isHint = false								//宝石被提示的状态
+						temp.x = i 										//当前宝石横坐标
+						temp.y = start.y								//当前宝石纵坐标
 
 						this.matrix[i][start.y] = temp
 					}
@@ -372,6 +387,26 @@
 	border: 2px solid #000;
 	width: 58px;
 	height: 58px;
+}
+
+.hinted {
+	opacity: 1;
+	border: 2px solid #000;
+	width: 58px;
+	height: 58px;
+	animation-name: fadeInOpacity;
+	animation-iteration-count: 1;
+	animation-timing-function: ease-in;
+	animation-duration: 2s;
+}
+
+@keyframes fadeInOpacity {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
 
 </style>
