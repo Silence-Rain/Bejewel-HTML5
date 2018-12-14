@@ -54,15 +54,16 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class HintHandler(BaseHandler):
 	async def post(self):
-		matrix = self.get_argument("matrix")
+		matrix = self.get_argument("matrix") + "\n"
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM) 
 		s.connect(("localhost", 9992))
+		s.send(bytes(matrix, "utf8"))
 
-		s.send(b"%s\n" % matrix)
-
-		res = s.recv(1024).decode("utf8")
+		res = s.recv(5).decode("utf8").strip()
+		print(res)
 		s.close()
 
+		ret = res.split(" ") if res != "error" else res
 		self.finish_success(result={"res": res.split(" ")})
 
 
