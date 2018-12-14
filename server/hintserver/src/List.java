@@ -37,6 +37,42 @@ public class List {
 		}
 		
 	}
+	// 从字符串初始化list
+	public List(String maxtrix)
+	{
+		char[] elements=maxtrix.toCharArray();
+		int k=0;
+		int num=elements.length/2;
+		int arrays=0;
+		if(num%length!=0)
+			arrays=num/length+1;
+		else
+			arrays=num/length;
+		for(int i=0;i<arrays;i++)
+		{
+			if(k>=(elements.length-1))
+				break;
+			for(int j=0;j<length;j++)
+			{
+				if(elements[k]!=' '&&k<(elements.length-1))
+				{ 
+					Array[i][j]=Integer.parseInt(String.valueOf(maxtrix.charAt(k)));
+					k++;
+				}
+				else if(elements[k]==' '&&k<(elements.length-1))
+				{
+					k++;
+					Array[i][j]=Integer.parseInt(String.valueOf(maxtrix.charAt(k)));
+					k++;
+				}
+				else if(k>=(elements.length-1))
+				{
+					break;
+				}
+			}
+		}
+		
+	}
 	//从第三个向前检查1和2和3是否同行，比如A、B、C坐标为1、2、3，则从C开始，检查A、B是否为同色
 	public int autocheckarray(int i,int j)
 	{
@@ -57,40 +93,28 @@ public class List {
 		else 
 			return -2;
 	}
-	//测试函数main
+	//测试函数
 	public int[] test()
 	{ 
-		// List list=new List();
-		// Pairs pairs=new Pairs();//对儿为自己定义的返回x、y坐标的自定义类
-		// int x,y=0;
-		// //输出8*8矩阵
-		// for(int i=0;i<list.length;i++)
-		// {
-		// 	for(int j=0;j<list.length;j++)
-		// 	{
-		// 		System.out.print(list.Array[i][j]);
-		// 	}
-		// 	System.out.println();
-		// }
-		// //自动玩一次并判断是否有可以交换消除的位置
-		// pairs=list.autoplay(list);
-		// if(pairs.getfirst()>=0||pairs.getSecond()>=0)
-		// {
-		// 	x=pairs.getfirst()+1;
-		// 	y=pairs.getSecond()+1;
+		List list=this;
+		Pairs pairs=new Pairs();//对儿为自己定义的返回x、y坐标的自定义类
+		int x,y=0;
 
-		// 	int[] ret = {x, y};
-		// 	return ret;
-		// }
-		// else
-		// {
-		// 	int[] ret = {-1, -1};
-		// 	return ret;
-		// }
-
+		//自动玩一次并判断是否有可以交换消除的位置
+		pairs=list.autoplay(list);
 		int[] ret = {-1, -1};
-		return ret;
-		
+
+		if(pairs.getfirst()>=0||pairs.getSecond()>=0)
+		{
+			ret[0] = pairs.getfirst()+1;
+			ret[1] = pairs.getSecond()+1;
+
+			return ret;
+		}
+		else
+		{
+			return ret;
+		}	
 	}
 	//为自动玩的函数autoplay提供一个封装的方法，该方法会尝试交换两个宝石，然后用之前封装的列检查函数来判断是否3个同色，这样虽然比直接判断要多两步交换的步骤，
 	//却减少了写代码时思考坐标的任务量，是一个偷懒操作。
@@ -143,210 +167,215 @@ public class List {
 	//如果调用对象的Array可以被直接使用，而不需要当做参数传递的话。如果是打算直接用Array的方法，需要将下面所有list.Array改成Array。
 	public Pairs autoplay(List list)
 	{
-		
-	
 		Pairs pairs=new Pairs();
-		for(int i=0;i<list.length;i++)
-		{
-			for(int j=0;j<list.length;j++)
+
+		try {
+			for(int i=0;i<list.length;i++)
 			{
-				if(i>5||j>5)//开始除左上区域的检测
+				for(int j=0;j<list.length;j++)
 				{
-						if(i<=5)
+					if(i>5||j>5)//开始除左上区域的检测
+					{
+							if(i<=5)
+							{
+								if(list.Array[i][j]==list.Array[i+1][j])
+								{
+									pairs=autochangeforcolumn(i+2,i+2,i+2,j,j-1,j,list);
+									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+										return pairs;
+								
+									if(i!=5)
+									{
+										pairs=autochangeforcolumn(i+2,i+3,i+2,j,j,j,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+		
+									
+											
+									if(j!=7)
+									{	
+										pairs=autochangeforcolumn(i+2,i+2,i+2,j,j+1,j,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+										
+								}
+								if(list.Array[i][j]==list.Array[i+2][j])
+								{
+									pairs=autochangeforcolumn(i+1,i+1,i+2,j,j-1,j,list);
+									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+										return pairs;
+									if(j!=7)
+									{
+										pairs=autochangeforcolumn(i+1,i+1,i+2,j,j+1,j,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+									if(i<=4)
+									{
+										pairs=autochangeforcolumn(i,i+1,i+3,j,j,j,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+								}
+								if(list.Array[i][j]==list.Array[i+1][j+1])
+								{
+									if(j!=7)
+									{
+										pairs=autochangeforcolumn(i,i,i+2,j,j+1,j+1,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+								}
+							}//右上部分校验完成
+							else if(j<=5)
+							{
+								if(list.Array[i][j]==list.Array[i][j+1])
+								{
+									pairs=autochangeforarray(i,i-1,i,j+2,j+2,j+2,list);
+									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+										return pairs;
+									if(j!=5)
+									{
+										pairs=autochangeforarray(i,i,i,j+2,j+3,j+2,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+									if(i!=7)
+									{
+										pairs=autochangeforarray(i,i+1,i,j+2,j+2,j+2,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+								}
+								if(list.Array[i][j]==list.Array[i][j+2])
+								{
+									pairs=autochangeforarray(i,i-1,i,j+1,j+1,j+2,list);
+									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+										return pairs;
+									if(i!=7)
+									{
+										pairs=autochangeforarray(i,i+1,i,j+1,j+1,j+2,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+									if(j<=4)
+									{
+										pairs=autochangeforarray(i,i,i,j,j+1,j+3,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+								}
+								if(list.Array[i][j]==list.Array[i+1][j+1])
+								{
+									if(i!=7)
+									{
+										pairs=autochangeforarray(i,i+1,i+1,j,j,j+2,list);
+										if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+											return pairs;
+									}
+								}
+							}//左下部分校验完成
+							
+					}
+					else//开始左上区域的情况监测
+					{
+						if(list.Array[i][j]==list.Array[i+1][j])
 						{
-							if(list.Array[i][j]==list.Array[i+1][j])
+							if(j!=0)
 							{
 								pairs=autochangeforcolumn(i+2,i+2,i+2,j,j-1,j,list);
 								if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
 									return pairs;
-							
-								if(i!=5)
-								{
-									pairs=autochangeforcolumn(i+2,i+3,i+2,j,j,j,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
-	
-								
-										
-								if(j!=7)
-								{	
-									pairs=autochangeforcolumn(i+2,i+2,i+2,j,j+1,j,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
-									
 							}
-							if(list.Array[i][j]==list.Array[i+2][j])
+							
+							if(i<5)
 							{
-								pairs=autochangeforcolumn(i+1,i+1,i+2,j,j-1,j,list);
+								pairs=autochangeforcolumn(i+2,i+3,i+2,j,j,j,list);
 								if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
 									return pairs;
-								if(j!=7)
-								{
-									pairs=autochangeforcolumn(i+1,i+1,i+2,j,j+1,j,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
-								if(i<=4)
-								{
-									pairs=autochangeforcolumn(i,i+1,i+3,j,j,j,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
 							}
-							if(list.Array[i][j]==list.Array[i+1][j+1])
-							{
-								if(j!=7)
-								{
-									pairs=autochangeforcolumn(i,i,i+2,j,j+1,j+1,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
-							}
-						}//右上部分校验完成
-						else if(j<=5)
+								
+							pairs=autochangeforcolumn(i+2,i+2,i+2,j,j+1,j,list);
+							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+								return pairs;
+						}
+						else if(list.Array[i][j]==list.Array[i][j+1])
 						{
-							if(list.Array[i][j]==list.Array[i][j+1])
+							if(i!=0)
 							{
 								pairs=autochangeforarray(i,i-1,i,j+2,j+2,j+2,list);
 								if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
 									return pairs;
-								if(j!=5)
-								{
-									pairs=autochangeforarray(i,i,i,j+2,j+3,j+2,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
-								if(i!=7)
-								{
-									pairs=autochangeforarray(i,i+1,i,j+2,j+2,j+2,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
 							}
-							if(list.Array[i][j]==list.Array[i][j+2])
+
+							if(j<5)
+							{
+								pairs=autochangeforarray(i,i,i,j+2,j+3,j+2,list);
+								if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+									return pairs;
+							}
+
+							
+									
+								
+							pairs=autochangeforarray(i,i+1,i,j+2,j+2,j+2,list);
+							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+								return pairs;
+						}//完成了第一种情况的校验
+						else if(list.Array[i][j]==list.Array[i+2][j])//开始第二种和第三种校验
+						{
+							if(j!=0)
+							{
+								pairs=autochangeforcolumn(i+1,i+1,i+2,j,j-1,j,list);
+								if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+									return pairs;
+							}
+							pairs=autochangeforcolumn(i+1,i+1,i+2,j,j+1,j,list);
+							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+								return pairs;
+							//第三种情况1
+							pairs=autochangeforcolumn(i,i+1,i+3,j,j,j,list);
+							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+								return pairs;
+							
+						}
+						else if(list.Array[i][j]==list.Array[i][j+2])
+						{
+							if(i!=0)
 							{
 								pairs=autochangeforarray(i,i-1,i,j+1,j+1,j+2,list);
 								if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
 									return pairs;
-								if(i!=7)
-								{
-									pairs=autochangeforarray(i,i+1,i,j+1,j+1,j+2,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
-								if(j<=4)
-								{
-									pairs=autochangeforarray(i,i,i,j,j+1,j+3,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
 							}
-							if(list.Array[i][j]==list.Array[i+1][j+1])
-							{
-								if(i!=7)
-								{
-									pairs=autochangeforarray(i,i+1,i+1,j,j,j+2,list);
-									if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-										return pairs;
-								}
-							}
-						}//左下部分校验完成
-						
-				}
-				else//开始左上区域的情况监测
-				{
-					if(list.Array[i][j]==list.Array[i+1][j])
-					{
-						if(j!=0)
-						{
-							pairs=autochangeforcolumn(i+2,i+2,i+2,j,j-1,j,list);
+							pairs=autochangeforarray(i,i+1,i,j+1,j+1,j+2,list);
 							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
 								return pairs;
-						}
-						
-						if(i<5)
-						{
-							pairs=autochangeforcolumn(i+2,i+3,i+2,j,j,j,list);
+							//第三种情况2
+							pairs=autochangeforarray(i,i,i,j,j+1,j+3,list);
 							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
 								return pairs;
-						}
 							
-						pairs=autochangeforcolumn(i+2,i+2,i+2,j,j+1,j,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
+						}//完成第二种和第三种的部分校验
+						else if(list.Array[i][j]==list.Array[i+1][j+1])
+						{
+							pairs=autochangeforarray(i,i+1,i+1,j,j,j+2,list);
+							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+								return pairs;
+							pairs=autochangeforcolumn(i,i,i+2,j,j+1,j+1,list);
+							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
+								return pairs;
+						}//完成第三种校验,左上全部校验完成
 					}
-					else if(list.Array[i][j]==list.Array[i][j+1])
-					{
-						if(i!=0)
-						{
-							pairs=autochangeforarray(i,i-1,i,j+2,j+2,j+2,list);
-							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-								return pairs;
-						}
-
-						if(j<5)
-						{
-							pairs=autochangeforarray(i,i,i,j+2,j+3,j+2,list);
-							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-								return pairs;
-						}
-
-						
-								
-							
-						pairs=autochangeforarray(i,i+1,i,j+2,j+2,j+2,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
-					}//完成了第一种情况的校验
-					else if(list.Array[i][j]==list.Array[i+2][j])//开始第二种和第三种校验
-					{
-						if(j!=0)
-						{
-							pairs=autochangeforcolumn(i+1,i+1,i+2,j,j-1,j,list);
-							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-								return pairs;
-						}
-						pairs=autochangeforcolumn(i+1,i+1,i+2,j,j+1,j,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
-						//第三种情况1
-						pairs=autochangeforcolumn(i,i+1,i+3,j,j,j,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
-						
-					}
-					else if(list.Array[i][j]==list.Array[i][j+2])
-					{
-						if(i!=0)
-						{
-							pairs=autochangeforarray(i,i-1,i,j+1,j+1,j+2,list);
-							if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-								return pairs;
-						}
-						pairs=autochangeforarray(i,i+1,i,j+1,j+1,j+2,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
-						//第三种情况2
-						pairs=autochangeforarray(i,i,i,j,j+1,j+3,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
-						
-					}//完成第二种和第三种的部分校验
-					else if(list.Array[i][j]==list.Array[i+1][j+1])
-					{
-						pairs=autochangeforarray(i,i+1,i+1,j,j,j+2,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
-						pairs=autochangeforcolumn(i,i,i+2,j,j+1,j+1,list);
-						if(pairs.getfirst()>=0&&pairs.getSecond()>=0)
-							return pairs;
-					}//完成第三种校验,左上全部校验完成
 				}
 			}
+			pairs.add(-1, -1);//这里设计比较笨，-1这个数字小于0，则看成是没找到可用位置。可以适当根据宝石数字变化来更改pairs.getfirst和pairs.getsecond的边界判断条件。
+			return pairs;
 		}
-		pairs.add(-1, -1);//这里设计比较笨，-1这个数字小于0，则看成是没找到可用位置。可以适当根据宝石数字变化来更改pairs.getfirst和pairs.getsecond的边界判断条件。
-		return pairs;
+		catch (Exception e) {
+			pairs.add(-1, -1);//这里设计比较笨，-1这个数字小于0，则看成是没找到可用位置。可以适当根据宝石数字变化来更改pairs.getfirst和pairs.getsecond的边界判断条件。
+			return pairs; 
+		}
 	}
 }
