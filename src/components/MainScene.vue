@@ -60,7 +60,7 @@
 		methods: {
 			changeSelect (pos) {
 				pos = JSON.parse(pos)
-				this.matrix[pos[1]][pos[0]].isHint = true
+				this.matrix[pos[0]][pos[1]].isHint = true
 			},
 			getMatrix () {
 				return this.matrix

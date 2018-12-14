@@ -24,9 +24,19 @@
 				axios.post(this.baseUrl+"/hint", JSON.stringify({matrix: this.mat}))
 					.then(response => {
 						let position = response.data.result.res
-						this.$parent.$emit("hint", JSON.stringify(position))
+
+						if (position == "error") {
+							alert("Hint模块出错，请将bug反馈到daniel.s.mo503@gmail.com")
+						} else if (position[0] == -1 && position[1] == -1) {
+							alert("找不到可以交换的位置，游戏结束！")
+						} else {
+							alert(`提示位置：第${position[0]}行第${position[1]}列`)
+							position[0] -= 1
+							position[1] -= 1
+							this.$parent.$emit("hint", JSON.stringify(position))
+						}
 					})
-					.catch(response => alert("保存失败，请稍后再试"))
+					.catch(response => alert("网络错误，请稍后再试"))
 			},
 
 			save () {
